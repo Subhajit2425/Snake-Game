@@ -122,6 +122,7 @@
   <!-- 🔊 Sound Effects -->
   <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
   <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
+  <audio id="startSound" src="https://www.soundjay.com/buttons/button-11.mp3"></audio>
 
   <script>
     const gameDiv = document.getElementById('game');
@@ -132,6 +133,7 @@
     const screen = document.getElementById('gameText');
     const eatSound = document.getElementById('eatSound');
     const gameOverSound = document.getElementById('gameOverSound');
+    const startSound = document.getElementById('startSound');
 
     function initGame() {
       x = Math.floor(width / 2);
@@ -243,6 +245,7 @@
     }
 
     function startGame() {
+      startSound.play();
       initGame();
       gameNo++;
       isPaused = false;
@@ -261,17 +264,19 @@
     function resumeGame() { if (gameRunning) isPaused = false; }
 
     function selectDifficulty() {
-      let choice = prompt("Choose difficulty: E (Easy), M (Medium), H (Hard)").toLowerCase();
+      // Show the difficulty selection modal
+      document.getElementById("difficultyModal").style.display = "flex";
+    }
+
+    function setDifficulty(choice) {
       if (choice === 'e') {
         speed = 130; difficulty = "Easy"; obstacleCount = 15;
       } else if (choice === 'm') {
         speed = 105; difficulty = "Medium"; obstacleCount = 20;
       } else if (choice === 'h') {
         speed = 80; difficulty = "Hard"; obstacleCount = 25;
-      } else {
-        alert("Invalid choice! Defaulting to Easy.");
-        speed = 105; difficulty = "Easy"; obstacleCount = 5;
       }
+      document.getElementById("difficultyModal").style.display = "none";
       startGame();
     }
 
@@ -295,5 +300,15 @@
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
   </script>
+
+  <!-- Add inside <body> -->
+  <div id="difficultyModal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
+    <h2>Select Difficulty</h2>
+    <div>
+      <button onclick="setDifficulty('e')"> Easy </button>
+      <button onclick="setDifficulty('m')"> Medium </button>
+      <button onclick="setDifficulty('h')"> Hard </button>
+    </div>
+  </div>
 </body>
 </html>
