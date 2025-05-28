@@ -120,8 +120,8 @@
   </div>
 
   <!-- 🔊 Sound Effects -->
-  <audio id="eatSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-  <audio id="gameOverSound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
+  <audio id="eatSound" src="https://www.soundjay.com/human/bone-crack-1.mp3"></audio>
+  <audio id="gameOverSound" src="https://www.soundjay.com/buttons/button-4.mp3"></audio>
 
   <script>
     const gameDiv = document.getElementById('game');
@@ -290,30 +290,6 @@
       else if (key === "KeyP") isPaused = !isPaused;
       else if (key === "KeyR" && gameOver) startGame();
       else if (key === "KeyQ" && gameOver) showMenu();
-    });
-
-    // ✅ Swipe Detection
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    window.addEventListener("touchstart", e => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    });
-
-    window.addEventListener("touchend", e => {
-      const touch = e.changedTouches[0];
-      const dx = touch.clientX - touchStartX;
-      const dy = touch.clientY - touchStartY;
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 30 && dir !== "LEFT") dir = "RIGHT";
-        else if (dx < -30 && dir !== "RIGHT") dir = "LEFT";
-      } else {
-        if (dy > 30 && dir !== "UP") dir = "DOWN";
-        else if (dy < -30 && dir !== "DOWN") dir = "UP";
-      }
     });
 
     // ✅ Load high score
