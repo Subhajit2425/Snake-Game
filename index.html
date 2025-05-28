@@ -99,12 +99,12 @@
     <!-- ✅ Mobile Controls -->
     <div id="mobileControls">
       <div style="margin-bottom: 5px;">
-        <button class="mobileButtons" onclick="if(dir !== 'DOWN') dir = 'UP'">⬆️</button>
+        <button class="mobileButtons" onclick="move('UP')">⬆️</button>
       </div>
       <div style="display: flex; gap: 10px;">
-        <button class="mobileButtons" onclick="if(dir !== 'RIGHT') dir = 'LEFT'">⬅️</button>
-        <button class="mobileButtons" onclick="if(dir !== 'UP') dir = 'DOWN'">⬇️</button>
-        <button class="mobileButtons" onclick="if(dir !== 'LEFT') dir = 'RIGHT'">➡️</button>
+        <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
+        <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
+        <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
       </div>
     </div>
   </div>
@@ -244,6 +244,27 @@
       alert("========= [ INSTRUCTIONS ] =========\n\n1. Use arrow keys to control the snake.\n2. Eat '0' to grow.\n3. Avoid crashing into walls or yourself.\n4. Press [P] to pause.");
     }
 
+    function move(newDir) {
+      if (!gameRunning) return; // game not started yet
+
+      // Only allow first direction to start game
+      if (!dir) {
+        dir = newDir;
+        gameInterval = setInterval(gameLoop, speed);
+      } else {
+        // Prevent reverse movement
+        if (
+          (newDir === 'UP' && dir !== 'DOWN') ||
+          (newDir === 'DOWN' && dir !== 'UP') ||
+          (newDir === 'LEFT' && dir !== 'RIGHT') ||
+          (newDir === 'RIGHT' && dir !== 'LEFT')
+        ) {
+          dir = newDir;
+        }
+      }
+    }
+
+
     function startGame() {
       startSound.play();
       initGame();
@@ -256,7 +277,6 @@
       gameDiv.classList.remove("hidden");
 
       clearInterval(gameInterval);
-      gameInterval = setInterval(gameLoop, speed);
       draw();
     }
 
@@ -288,14 +308,25 @@
     // ✅ Keyboard Controls
     window.addEventListener("keydown", e => {
       const key = e.code;
-      if (key === "ArrowUp" && dir !== "DOWN") dir = "UP";
-      else if (key === "ArrowDown" && dir !== "UP") dir = "DOWN";
-      else if (key === "ArrowLeft" && dir !== "RIGHT") dir = "LEFT";
-      else if (key === "ArrowRight" && dir !== "LEFT") dir = "RIGHT";
+
+      const startIfNeeded = (newDir, blockDir) => {
+        if (!dir && gameRunning) {
+          dir = newDir;
+          gameInterval = setInterval(gameLoop, speed);
+        } else if (dir !== blockDir) {
+          dir = newDir;
+        }
+      };
+
+      if (key === "ArrowUp") startIfNeeded("UP", "DOWN");
+      else if (key === "ArrowDown") startIfNeeded("DOWN", "UP");
+      else if (key === "ArrowLeft") startIfNeeded("LEFT", "RIGHT");
+      else if (key === "ArrowRight") startIfNeeded("RIGHT", "LEFT");
       else if (key === "KeyP") isPaused = !isPaused;
       else if (key === "KeyR" && gameOver) startGame();
       else if (key === "KeyQ" && gameOver) showMenu();
     });
+
 
     // ✅ Load high score
     highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
