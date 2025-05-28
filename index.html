@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game JS</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      white-space: pre;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .hidden { display: none; }
+
+    #game, #menu, #gameOver {
+      text-align: center;
+      width: 100vh;
+    }
+
+    #controls, #menuButtons, #overButtons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    #mobileControls {
+      margin-top: 15px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      #mobileControls {
+        display: flex;
+      }
+    }
+
+    .mobileButtons {
+      width: 60px;
+      height: 60px;
+    }
+
+    #SnakeM {
+      font-size: xx-large;
+    }
+
+    button {
+      font-size: 16px;
+      padding: 5px 15px;
+      background-color: #222;
+      color: white;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+
+    #exitBtn, #toMenuBtn {
+      background-color: #C42B1C;
+    }
+
+    #exitBtn:hover, #toMenuBtn:hover {
+      background-color: #a11f15;
+    }
+  </style>
+</head>
+<body>
+  <!-- ✅ Main Menu -->
+  <div id="menu">
+    <h1 id="SnakeM">SNAKE GAME</h1>
+    <div id="menuButtons">
+      <button onclick="selectDifficulty()">Start Game</button>
+      <button onclick="instructions()">Instructions</button>
+    </div>
+  </div>
+
+  <!-- ✅ Game Screen -->
+  <div id="game" class="hidden">
+    <div id="gameText"></div>
+    <div id="controls">
+      <button onclick="pauseGame()">Pause</button>
+      <button onclick="resumeGame()">Resume</button>
+      <button id="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+    </div>
+
+    <!-- ✅ Mobile Controls -->
+    <div id="mobileControls">
+      <div style="margin-bottom: 5px;">
+        <button class="mobileButtons" onclick="if(dir !== 'DOWN') dir = 'UP'">⬆️</button>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="mobileButtons" onclick="if(dir !== 'RIGHT') dir = 'LEFT'">⬅️</button>
+        <button class="mobileButtons" onclick="if(dir !== 'UP') dir = 'DOWN'">⬇️</button>
+        <button class="mobileButtons" onclick="if(dir !== 'LEFT') dir = 'RIGHT'">➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Game Over Screen -->
+  <div id="gameOver" class="hidden">
+    <h2 id="gameOverText"></h2>
+    <div id="overButtons">
+      <button onclick="showMenu()">Cancel</button>
+      <button onclick="startGame()">Restart</button>
+      <button id="toMenuBtn" onclick="showMenu()">Exit</button>
+    </div>
+  </div>
+
+  <!-- 🔊 Sound Effects -->
+  <audio id="eatSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <audio id="gameOverSound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
+
+  <script>
+    const gameDiv = document.getElementById('game');
+    const width = 50, height = 20, numFruits = 3;
+    let x, y, score, nTail, gameOver = false, dir = '', isPaused = false, gameNo = 0;
+    let tailX = [], tailY = [], fruitX = [], fruitY = [], obstacles = [];
+    let speed = 100, difficulty = ' Easy ', highScore = 0, gameInterval, gameRunning = false;
+    const screen = document.getElementById('gameText');
+    const eatSound = document.getElementById('eatSound');
+    const gameOverSound = document.getElementById('gameOverSound');
+
+    function initGame() {
+      x = Math.floor(width / 2);
+      y = Math.floor(height / 2);
+      score = 0; nTail = 0;
+      dir = ''; gameOver = false;
+      tailX = []; tailY = [];
+      fruitX = Array.from({ length: numFruits }, () => Math.floor(Math.random() * width));
+      fruitY = Array.from({ length: numFruits }, () => Math.floor(Math.random() * height));
+      obstacles = Array.from({ length: obstacleCount || 5 }, () => ({
+        x: Math.floor(Math.random() * (width - 1)),
+        y: Math.floor(Math.random() * (height - 1))
+      }));
+    }
+
+    function showMenu() {
+      document.getElementById("menu").classList.remove("hidden");
+      gameDiv.classList.add("hidden");
+      document.getElementById("gameOver").classList.add("hidden");
+      clearInterval(gameInterval);
+      gameRunning = false;
+    }
+
+    function isObstacle(j, i) {
+      return obstacles.some(o => (j === o.x || j === o.x + 1) && (i === o.y || i === o.y + 1));
+    }
+
+    function draw() {
+      let output = '';
+      output += '[]=[]=[]=[]= [ GOLDEN SNAKE ] =[]=[]=[]=[]=\n\n';
+      output += ` * Game - ${gameNo} [ ${difficulty} ]\n`;
+      output += ' :' + ':'.repeat(width + 4) + ':\n';
+
+      for (let i = 0; i < height; i++) {
+        output += ' ::';
+        for (let j = 0; j < width; j++) {
+          if (x === j && y === i) output += '@';
+          else if (fruitX.some((fx, idx) => fx === j && fruitY[idx] === i)) output += '0';
+          else if (isObstacle(j, i)) output += 'X';
+          else {
+            let found = false;
+            for (let t = 0; t < nTail; t++) {
+              if (tailX[t] === j && tailY[t] === i) {
+                output += 'o';
+                found = true; break;
+              }
+            }
+            if (!found) output += ' ';
+          }
+        }
+        output += '::\n';
+      }
+      output += ' :' + ':'.repeat(width + 4) + ':\n';
+      output += ` | Score: ${score} | Highest Score: ${highScore}\n`;
+      screen.textContent = output;
+    }
+
+    function update() {
+      if (gameOver || isPaused) return;
+
+      for (let i = nTail - 1; i > 0; i--) {
+        tailX[i] = tailX[i - 1];
+        tailY[i] = tailY[i - 1];
+      }
+      if (nTail > 0) {
+        tailX[0] = x;
+        tailY[0] = y;
+      }
+
+      switch (dir) {
+        case 'LEFT': x--; break;
+        case 'RIGHT': x++; break;
+        case 'UP': y--; break;
+        case 'DOWN': y++; break;
+      }
+
+      if (x < 0 || x >= width || y < 0 || y >= height) gameOver = true;
+      for (let i = 0; i < nTail; i++) if (tailX[i] === x && tailY[i] === y) gameOver = true;
+      if (isObstacle(x, y)) gameOver = true;
+
+      for (let i = 0; i < numFruits; i++) {
+        if (x === fruitX[i] && y === fruitY[i]) {
+          score += 10;
+          eatSound.play();
+          fruitX[i] = Math.floor(Math.random() * width);
+          fruitY[i] = Math.floor(Math.random() * height);
+          nTail++;
+        }
+      }
+
+      if (gameOver) endGame();
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      gameRunning = false;
+      gameOverSound.play();
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+      }
+      gameDiv.classList.add("hidden");
+      document.getElementById("gameOver").classList.remove("hidden");
+      document.getElementById("gameOverText").textContent = `Game Over!\nScore: ${score}\nHigh Score: ${highScore}`;
+    }
+
+    function instructions() {
+      alert("========= [ INSTRUCTIONS ] =========\n\n1. Use arrow keys to control the snake.\n2. Eat '0' to grow.\n3. Avoid crashing into walls or yourself.\n4. Press [P] to pause.");
+    }
+
+    function startGame() {
+      initGame();
+      gameNo++;
+      isPaused = false;
+      gameRunning = true;
+
+      document.getElementById("menu").classList.add("hidden");
+      document.getElementById("gameOver").classList.add("hidden");
+      gameDiv.classList.remove("hidden");
+
+      clearInterval(gameInterval);
+      gameInterval = setInterval(gameLoop, speed);
+      draw();
+    }
+
+    function pauseGame() { isPaused = true; }
+    function resumeGame() { if (gameRunning) isPaused = false; }
+
+    function selectDifficulty() {
+      let choice = prompt("Choose difficulty: E (Easy), M (Medium), H (Hard)").toLowerCase();
+      if (choice === 'e') {
+        speed = 130; difficulty = "Easy"; obstacleCount = 15;
+      } else if (choice === 'm') {
+        speed = 105; difficulty = "Medium"; obstacleCount = 20;
+      } else if (choice === 'h') {
+        speed = 80; difficulty = "Hard"; obstacleCount = 25;
+      } else {
+        alert("Invalid choice! Defaulting to Easy.");
+        speed = 105; difficulty = "Easy"; obstacleCount = 5;
+      }
+      startGame();
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+    }
+
+    // ✅ Keyboard Controls
+    window.addEventListener("keydown", e => {
+      const key = e.code;
+      if (key === "ArrowUp" && dir !== "DOWN") dir = "UP";
+      else if (key === "ArrowDown" && dir !== "UP") dir = "DOWN";
+      else if (key === "ArrowLeft" && dir !== "RIGHT") dir = "LEFT";
+      else if (key === "ArrowRight" && dir !== "LEFT") dir = "RIGHT";
+      else if (key === "KeyP") isPaused = !isPaused;
+      else if (key === "KeyR" && gameOver) startGame();
+      else if (key === "KeyQ" && gameOver) showMenu();
+    });
+
+    // ✅ Swipe Detection
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    window.addEventListener("touchstart", e => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    });
+
+    window.addEventListener("touchend", e => {
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 30 && dir !== "LEFT") dir = "RIGHT";
+        else if (dx < -30 && dir !== "RIGHT") dir = "LEFT";
+      } else {
+        if (dy > 30 && dir !== "UP") dir = "DOWN";
+        else if (dy < -30 && dir !== "DOWN") dir = "UP";
+      }
+    });
+
+    // ✅ Load high score
+    highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+  </script>
+</body>
+</html>
