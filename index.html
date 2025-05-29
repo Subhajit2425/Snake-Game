@@ -134,13 +134,9 @@
     border-color: rgb(0, 240, 240);
   }
 
-  #exitBtn, #toMenuBtn {
+  .exitBtn {
     background: linear-gradient(135deg, #C42B1C, #5a0e09);
     border-color:  rgb(65, 119, 234);
-  }
-
-  #exitBtn:hover, #toMenuBtn:hover {
-    background: linear-gradient(135deg, #a11f15, #7f1611);
   }
 
   @keyframes fadeIn {
@@ -167,7 +163,7 @@
     <div id="controls">
       <button onclick="pauseGame()">Pause</button>
       <button onclick="resumeGame()">Resume</button>
-      <button id="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
+      <button class="exitBtn" onclick="if (!isPaused) pauseGame(); showMenu()">Exit</button>
     </div>
 
     <!-- ✅ Mobile Controls -->
@@ -192,7 +188,7 @@
     <div id="overButtons">
       <button onclick="showMenu()">Cancel</button>
       <button onclick="startGame()">Restart</button>
-      <button id="toMenuBtn" onclick="showMenu()">Exit</button>
+      <button class="exitBtn" onclick="showMenu()">Exit</button>
     </div>
   </div>
 
