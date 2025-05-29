@@ -41,10 +41,11 @@
   }
 
   #mobileControls {
-    margin-top: 15px;
+    margin-top: 20px;
     display: none;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   @media (max-width: 768px) {
@@ -54,10 +55,29 @@
   }
 
   .mobileButtons {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+    font-weight: bold;
     border-radius: 50%;
+    border: none;
+    background: radial-gradient(circle at 30% 30%, #00ffe1, #003b95);
+    color: #fff;
+    box-shadow: 0 0 10px #00ffe1, 0 0 20px #00ffe1;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
   }
+
+  .mobileButtons:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px #00ffe1, 0 0 10px #00ffe1;
+  }
+
+  .mobileRow {
+    display: flex;
+    gap: 15px;
+  }
+
 
   #SnakeM, #OverHeader {
     font-size: 2.5rem;
@@ -151,11 +171,12 @@
     </div>
 
     <!-- ✅ Mobile Controls -->
+    <!-- ✅ Mobile Controls -->
     <div id="mobileControls">
-      <div style="margin-bottom: 5px;">
+      <div class="mobileRow">
         <button class="mobileButtons" onclick="move('UP')">⬆️</button>
       </div>
-      <div style="display: flex; gap: 10px;">
+      <div class="mobileRow">
         <button class="mobileButtons" onclick="move('LEFT')">⬅️</button>
         <button class="mobileButtons" onclick="move('DOWN')">⬇️</button>
         <button class="mobileButtons" onclick="move('RIGHT')">➡️</button>
