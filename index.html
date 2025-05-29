@@ -59,7 +59,7 @@
     border-radius: 50%;
   }
 
-  #SnakeM, #difficulty {
+  #SnakeM, #OverHeader {
     font-size: 2.5rem;
     letter-spacing: 2px;
     background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
@@ -115,8 +115,8 @@
   }
 
   #exitBtn, #toMenuBtn {
-    background: linear-gradient(135deg, #C42B1C, #a11f15);
-    border-color: #a11f15;
+    background: linear-gradient(135deg, #C42B1C, #5a0e09);
+    border-color:  rgb(65, 119, 234);
   }
 
   #exitBtn:hover, #toMenuBtn:hover {
@@ -165,6 +165,8 @@
 
   <!-- ✅ Game Over Screen -->
   <div id="gameOver" class="hidden">
+    <div style="height: 5vh;"></div>
+  <div id="OverHeader"> !! Game Over !!</div>
     <h2 id="gameOverText"></h2>
     <div id="overButtons">
       <button onclick="showMenu()">Cancel</button>
@@ -291,7 +293,7 @@
       }
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.remove("hidden");
-      document.getElementById("gameOverText").textContent = `Game Over!\nScore: ${score}\nHigh Score: ${highScore}`;
+      document.getElementById("gameOverText").textContent = `Score: ${score}\nHigh Score: ${highScore}`;
     }
 
     function instructions() {
