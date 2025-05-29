@@ -48,6 +48,43 @@
     gap: 10px;
   }
 
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1b1b1b, #333);
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #00ffe1;
+    text-align: center;
+    color: white;
+    max-width: 600px;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .modal-content a {
+    color: #00ffe1;
+    text-decoration: underline;
+  }
+
+  .modal-content button {
+    margin-top: 20px;
+  }
+
+
   @media (max-width: 768px) {
     #mobileControls {
       display: flex;
@@ -79,7 +116,7 @@
   }
 
 
-  #SnakeM, #OverHeader {
+  #SnakeM, #OverHeader, #About {
     font-size: 2.5rem;
     letter-spacing: 2px;
     background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
@@ -154,6 +191,7 @@
     <div id="menuButtons">
       <button onclick="selectDifficulty()">Start Game</button>
       <button onclick="instructions()">Instructions</button>
+      <button onclick="showAbout()">About</button> <!-- 👈 New button -->
     </div>
   </div>
 
@@ -238,15 +276,23 @@
     function draw() {
       let output = '';
       output += `   Game - ${gameNo} [ ${difficulty} ]\n`;
-      output += ' :' + ':'.repeat(width + 4) + ':\n';
+      output += ' =' + '='.repeat(width + 4) + '=\n';
 
       for (let i = 0; i < height; i++) {
-        output += ' ::';
+        output += ' ||';
         for (let j = 0; j < width; j++) {
-          if (x === j && y === i) output += '@';
-          else if (fruitX.some((fx, idx) => fx === j && fruitY[idx] === i)) output += '0';
-          else if (isObstacle(j, i)) output += 'X';
-          else {
+          let isDrawn = false;
+
+          if (x === j && y === i) {
+            output += '@';
+            isDrawn = true;
+          } else if (fruitX.some((fx, idx) => fx === j && fruitY[idx] === i) && !isDrawn) {
+            output += '0';
+            isDrawn = true;
+          } else if (isObstacle(j, i) && !isDrawn) {
+            output += 'X';
+            isDrawn = true;
+          } else {
             let found = false;
             for (let t = 0; t < nTail; t++) {
               if (tailX[t] === j && tailY[t] === i) {
@@ -257,9 +303,9 @@
             if (!found) output += ' ';
           }
         }
-        output += '::\n';
+        output += '||\n';
       }
-      output += ' :' + ':'.repeat(width + 4) + ':\n';
+      output += ' =' + '='.repeat(width + 4) + '=\n';
       output += ` | Score: ${score} | Highest Score: ${highScore}\n`;
       screen.textContent = output;
     }
@@ -315,6 +361,14 @@
 
     function instructions() {
       alert("========= [ INSTRUCTIONS ] =========\n\n1. Use arrow keys to control the snake.\n2. Eat '0' to grow.\n3. Avoid crashing into walls or yourself.\n4. Press [P] to pause.");
+    }
+
+    function showAbout() {
+      document.getElementById("aboutModal").style.display = "flex";
+    }
+
+    function closeAbout() {
+      document.getElementById("aboutModal").style.display = "none";
     }
 
     function move(newDir) {
@@ -414,5 +468,21 @@
       <button onclick="setDifficulty('h')">Hard</button>
     </div>
   </div>
+
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2 id="About">About This Game</h2>
+      <p>
+        🎮 Welcome to the classic Snake Game remake!<br>
+        🚀 Built with HTML, CSS, and JavaScript.<br>
+        🐍 Eat the fruits (0) to grow your snake.<br>
+        ⚠️ Avoid walls, yourself, and obstacles (X).<br><br>
+        👨‍💻 Developed by: Subhajit<br>
+        🌐 GitHub: <a href="https://github.com/Subhajit2425" target="_blank">Click Here</a>
+      </p>
+      <button onclick="closeAbout()">Close</button>
+    </div>
+  </div>
+
 </body>
 </html>
