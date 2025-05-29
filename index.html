@@ -5,77 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game JS</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: monospace;
-      white-space: pre;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-    }
+  body {
+    background-color: black;
+    color: white;
+    font-family: monospace;
+    white-space: pre;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+  }
 
-    .hidden { display: none; }
+  .hidden { display: none; }
 
-    #game, #menu, #gameOver {
-      text-align: center;
-      width: 100vh;
-    }
+  #game, #menu, #gameOver {
+    text-align: center;
+    width: 100vh;
+  }
 
-    #controls, #menuButtons, #overButtons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
+  #menuButtons, #overButtons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
 
+  #controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  #mobileControls {
+    margin-top: 15px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
     #mobileControls {
-      margin-top: 15px;
-      display: none;
-      flex-direction: column;
-      align-items: center;
+      display: flex;
     }
+  }
 
-    @media (max-width: 768px) {
-      #mobileControls {
-        display: flex;
-      }
-    }
+  .mobileButtons {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
 
-    .mobileButtons {
-      width: 60px;
-      height: 60px;
-    }
+  #SnakeM, #difficulty {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #00ffea, #5b42f3, #ff3c83);
+    background-clip: text;               /* Add this line */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulseText 3s infinite;
+    margin-bottom: 20px;
+  }
 
-    #SnakeM {
-      font-size: xx-large;
-    }
+  #difficulty {
+    font-size: 2rem;
+  }
 
-    button {
-      font-size: 16px;
-      padding: 5px 15px;
-      background-color: #222;
-      color: white;
-      border: 1px solid #555;
-      cursor: pointer;
-    }
 
-    button:hover {
-      background-color: #444;
-    }
+  @keyframes pulseText {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
 
-    #exitBtn, #toMenuBtn {
-      background-color: #C42B1C;
-    }
+  #menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    animation: fadeIn 1s ease-in-out;
+  }
 
-    #exitBtn:hover, #toMenuBtn:hover {
-      background-color: #a11f15;
-    }
-  </style>
+  #menuButtons {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+  }
+
+  button {
+    font-size: 1rem;
+    padding: 10px 25px;
+    background: linear-gradient(135deg, #1f1f1f, #333);
+    color: #fff;
+    border: 2px solid rgb(65, 119, 234);
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+  }
+
+  button:hover {
+    background: linear-gradient(135deg, rgb(172, 15, 91), #4516b4);
+    transform: scale(1.05);
+    border-color: rgb(0, 240, 240);
+  }
+
+  #exitBtn, #toMenuBtn {
+    background: linear-gradient(135deg, #C42B1C, #a11f15);
+    border-color: #a11f15;
+  }
+
+  #exitBtn:hover, #toMenuBtn:hover {
+    background: linear-gradient(135deg, #a11f15, #7f1611);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+
 </head>
 <body>
   <!-- ✅ Main Menu -->
@@ -150,12 +204,13 @@
     }
 
     function showMenu() {
-      document.getElementById("menu").classList.remove("hidden");
+      document.getElementById("menu").style.display = "flex"; // 👈 restore buttons
       gameDiv.classList.add("hidden");
       document.getElementById("gameOver").classList.add("hidden");
       clearInterval(gameInterval);
       gameRunning = false;
     }
+
 
     function isObstacle(j, i) {
       return obstacles.some(o => (j === o.x || j === o.x + 1) && (i === o.y || i === o.y + 1));
@@ -163,8 +218,7 @@
 
     function draw() {
       let output = '';
-      output += '[]=[]=[]=[]= [ GOLDEN SNAKE ] =[]=[]=[]=[]=\n\n';
-      output += ` * Game - ${gameNo} [ ${difficulty} ]\n`;
+      output += `   Game - ${gameNo} [ ${difficulty} ]\n`;
       output += ' :' + ':'.repeat(width + 4) + ':\n';
 
       for (let i = 0; i < height; i++) {
@@ -272,7 +326,7 @@
       isPaused = false;
       gameRunning = true;
 
-      document.getElementById("menu").classList.add("hidden");
+      document.getElementById("menu").style.display = "none";
       document.getElementById("gameOver").classList.add("hidden");
       gameDiv.classList.remove("hidden");
 
@@ -333,12 +387,12 @@
   </script>
 
   <!-- Add inside <body> -->
-  <div id="difficultyModal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
-    <h2>Select Difficulty</h2>
+  <div id="difficultyModal" style="position:fixed; top: 0; left:0; width:100vw; height:100vh; background:#000000cc; color:white; display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000;">
+    <h2 id="difficulty">Select Difficulty</h2>
     <div>
-      <button onclick="setDifficulty('e')"> Easy </button>
-      <button onclick="setDifficulty('m')"> Medium </button>
-      <button onclick="setDifficulty('h')"> Hard </button>
+      <button onclick="setDifficulty('e')">Easy</button>
+      <button onclick="setDifficulty('m')">Medium</button>
+      <button onclick="setDifficulty('h')">Hard</button>
     </div>
   </div>
 </body>
